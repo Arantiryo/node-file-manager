@@ -1,4 +1,3 @@
-import { printCWD } from "./src/utils.js";
 import { FileManager } from "./src/file_manager.js";
 
 const currentPath = process.argv[1];
@@ -6,11 +5,14 @@ const userName = process.argv?.[2].split("=")?.[1];
 
 export const fileManager = new FileManager(userName);
 
+// Change working directory
+fileManager.switchToHomeDir();
+
 // Greet user
 fileManager.sayHello();
-printCWD();
+FileManager.printCWD();
 
-// Say goodbye
+// Say goodbye on exit
 process.on("SIGINT", (code) => {
   fileManager.sayGoodbye();
 });
@@ -21,5 +23,5 @@ process.stdin.on("data", (data) => {
 
   fileManager.handleCommand(input);
 
-  printCWD();
+  FileManager.printCWD();
 });
