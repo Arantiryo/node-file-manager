@@ -3,6 +3,7 @@ import path from "path";
 import fs from "fs";
 import fsp from "fs/promises";
 import { pipeline } from "stream/promises";
+import crypto from "crypto";
 
 export class FileManager {
   constructor(name) {
@@ -25,6 +26,7 @@ export class FileManager {
     mv: this.moveFile,
     rm: this.deleteFile,
     os: this.os,
+    hash: this.hash,
   };
 
   async handleCommand(input) {
@@ -39,6 +41,27 @@ export class FileManager {
     } else {
       console.error("Invalid input");
     }
+  }
+
+  async hash(fileName) {
+    const filePath = path.resolve(process.cwd(), fileName);
+
+    const hash = crypto.createHash("sha256");
+
+    const readStream = fs.createReadStream(filePath);
+
+    readStream.on("data", (chunk) => {
+      hash.update(chunk);
+    });
+
+    readStream.on("end", () => {
+      const fileHash = hash.digest("hex");
+      console.log(`Hash: ${fileHash}`);
+    });
+
+    readStream.on("error", (error) => {
+      console.error("Operation failed");
+    });
   }
 
   os(flag) {
