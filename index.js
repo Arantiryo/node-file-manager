@@ -6,7 +6,7 @@ import {
 } from "./src/utils.js";
 import { handleCommand } from "./src/command_handler.js";
 
-export const userName = process.argv?.[2].split("=")?.[1] || "user";
+export const userName = process.argv?.[2]?.split("=")?.[1] || "user";
 
 // Change working directory
 switchToHomeDir();
