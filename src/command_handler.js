@@ -1,3 +1,4 @@
+import { userName } from "../index.js";
 import { sayGoodbye } from "./utils.js";
 import { goUp, changeDirectory, list } from "./navigation.js";
 import {
@@ -13,7 +14,7 @@ import { hashCommand } from "./hash.js";
 import { compress, decompress } from "./zip.js";
 
 const commands = {
-  ".exit": sayGoodbye,
+  ".exit": () => sayGoodbye(userName),
   up: goUp,
   cd: changeDirectory,
   ls: list,
