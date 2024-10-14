@@ -2,6 +2,7 @@ import os from "os";
 import path from "path";
 import fs from "fs";
 import fsp from "fs/promises";
+import { pipeline } from "stream/promises";
 
 export class FileManager {
   constructor(name) {
@@ -21,6 +22,8 @@ export class FileManager {
     cat: this.cat,
     add: this.createFile,
     rn: this.renameFile,
+    cp: this.copyFile,
+    mv: this.moveFile,
   };
 
   handleCommand(input) {
@@ -30,6 +33,24 @@ export class FileManager {
       this.commands[command](...args);
     } else {
       console.error("Invalid input");
+    }
+  }
+
+  async moveFile(sourceFile, destinationFile) {
+    try {
+      const sourcePath = path.resolve(process.cwd(), sourceFile);
+      const destinationPath = path.resolve(process.cwd(), destinationFile);
+
+      const readStream = fs.createReadStream(sourcePath);
+      const writeStream = fs.createWriteStream(destinationPath);
+
+      await pipeline(readStream, writeStream);
+
+      await fsp.unlink(sourcePath);
+
+      console.log(`File moved from ${sourcePath} to ${destinationPath}`);
+    } catch (error) {
+      console.error("Error moving the file:", error.message);
     }
   }
 
@@ -46,7 +67,7 @@ export class FileManager {
 
       console.log(`File copied from ${sourcePath} to ${destinationPath}`);
     } catch (error) {
-      console.error("Operation failed");
+      console.error("Operation failed", error);
     }
   }
 
