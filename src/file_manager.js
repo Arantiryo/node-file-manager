@@ -33,6 +33,23 @@ export class FileManager {
     }
   }
 
+  async copyFile(sourceFile, destinationFile) {
+    try {
+      const sourcePath = path.resolve(process.cwd(), sourceFile);
+      const destinationPath = path.resolve(process.cwd(), destinationFile);
+
+      const readStream = fs.createReadStream(sourcePath);
+
+      const writeStream = fs.createWriteStream(destinationPath);
+
+      await pipeline(readStream, writeStream);
+
+      console.log(`File copied from ${sourcePath} to ${destinationPath}`);
+    } catch (error) {
+      console.error("Operation failed");
+    }
+  }
+
   async renameFile(oldName, newName) {
     try {
       const oldPath = path.resolve(process.cwd(), oldName);
