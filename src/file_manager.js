@@ -18,6 +18,7 @@ export class FileManager {
     up: this.goUp,
     cd: this.changeDirectory,
     ls: this.list,
+    cat: this.cat,
   };
 
   handleCommand(input) {
@@ -28,6 +29,18 @@ export class FileManager {
     } else {
       console.error("Invalid input");
     }
+  }
+
+  cat(filePath) {
+    const readStream = fs.createReadStream(filePath, { encoding: "utf-8" });
+
+    readStream.on("data", (chunk) => {
+      console.log(chunk);
+    });
+
+    readStream.on("error", (error) => {
+      console.error("Operation failed");
+    });
   }
 
   async list() {
@@ -41,15 +54,14 @@ export class FileManager {
           type: item.isDirectory() ? "Directory" : "File",
         }))
         .sort((a, b) => {
-          if (a.type !== b.type) {
-            return a.type === "Directory" ? -1 : 1;
-          }
+          if (a.type !== b.type) return a.type === "Directory" ? -1 : 1;
+
           a.type.localeCompare(b.type);
         });
 
       console.table(fileList);
     } catch (error) {
-      console.error("Error reading the directory:", error.message);
+      console.error("Operation failed");
     }
   }
 
