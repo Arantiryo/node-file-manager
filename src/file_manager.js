@@ -27,74 +27,61 @@ export class FileManager {
     rm: this.deleteFile,
   };
 
-  handleCommand(input) {
+  async handleCommand(input) {
     const [command, ...args] = input.split(" ");
 
     if (this.commands[command]) {
-      this.commands[command](...args);
+      try {
+        await this.commands[command](...args);
+      } catch (error) {
+        console.error("Operation failed");
+      }
     } else {
       console.error("Invalid input");
     }
   }
 
   async deleteFile(fileName) {
-    try {
-      const filePath = path.resolve(process.cwd(), fileName);
+    const filePath = path.resolve(process.cwd(), fileName);
 
-      await fsp.unlink(filePath);
+    await fsp.unlink(filePath);
 
-      console.log(`File deleted: ${filePath}`);
-    } catch (error) {
-      console.error("Operation failed");
-    }
+    console.log(`File deleted: ${filePath}`);
   }
 
   async moveFile(sourceFile, destinationFile) {
-    try {
-      const sourcePath = path.resolve(process.cwd(), sourceFile);
-      const destinationPath = path.resolve(process.cwd(), destinationFile);
+    const sourcePath = path.resolve(process.cwd(), sourceFile);
+    const destinationPath = path.resolve(process.cwd(), destinationFile);
 
-      const readStream = fs.createReadStream(sourcePath);
-      const writeStream = fs.createWriteStream(destinationPath);
+    const readStream = fs.createReadStream(sourcePath);
+    const writeStream = fs.createWriteStream(destinationPath);
 
-      await pipeline(readStream, writeStream);
+    await pipeline(readStream, writeStream);
 
-      await fsp.unlink(sourcePath);
+    await fsp.unlink(sourcePath);
 
-      console.log(`File moved from ${sourcePath} to ${destinationPath}`);
-    } catch (error) {
-      console.error("Operation failed");
-    }
+    console.log(`File moved from ${sourcePath} to ${destinationPath}`);
   }
 
   async copyFile(sourceFile, destinationFile) {
-    try {
-      const sourcePath = path.resolve(process.cwd(), sourceFile);
-      const destinationPath = path.resolve(process.cwd(), destinationFile);
+    const sourcePath = path.resolve(process.cwd(), sourceFile);
+    const destinationPath = path.resolve(process.cwd(), destinationFile);
 
-      const readStream = fs.createReadStream(sourcePath);
+    const readStream = fs.createReadStream(sourcePath);
+    const writeStream = fs.createWriteStream(destinationPath);
 
-      const writeStream = fs.createWriteStream(destinationPath);
+    await pipeline(readStream, writeStream);
 
-      await pipeline(readStream, writeStream);
-
-      console.log(`File copied from ${sourcePath} to ${destinationPath}`);
-    } catch (error) {
-      console.error("Operation failed");
-    }
+    console.log(`File copied from ${sourcePath} to ${destinationPath}`);
   }
 
   async renameFile(oldName, newName) {
-    try {
-      const oldPath = path.resolve(process.cwd(), oldName);
-      const newPath = path.resolve(process.cwd(), newName);
+    const oldPath = path.resolve(process.cwd(), oldName);
+    const newPath = path.resolve(process.cwd(), newName);
 
-      await fsp.rename(oldPath, newPath);
+    await fsp.rename(oldPath, newPath);
 
-      console.log(`File renamed from ${oldName} to ${newName}`);
-    } catch (error) {
-      console.error("Operation failed");
-    }
+    console.log(`File renamed from ${oldName} to ${newName}`);
   }
 
   cat(filePath) {
@@ -110,38 +97,30 @@ export class FileManager {
   }
 
   async createFile(fileName) {
-    try {
-      const filePath = path.resolve(process.cwd(), fileName);
-      const fileHandle = await fsp.open(filePath, "w");
+    const filePath = path.resolve(process.cwd(), fileName);
+    const fileHandle = await fsp.open(filePath, "w");
 
-      await fileHandle.close();
+    await fileHandle.close();
 
-      console.log(`Empty file created: ${filePath}`);
-    } catch (error) {
-      console.error("Operation failed");
-    }
+    console.log(`Empty file created: ${filePath}`);
   }
 
   async list() {
-    try {
-      const currentDir = process.cwd();
-      const items = await fsp.readdir(currentDir, { withFileTypes: true });
+    const currentDir = process.cwd();
+    const items = await fsp.readdir(currentDir, { withFileTypes: true });
 
-      const fileList = items
-        .map((item) => ({
-          name: item.name,
-          type: item.isDirectory() ? "Directory" : "File",
-        }))
-        .sort((a, b) => {
-          if (a.type !== b.type) return a.type === "Directory" ? -1 : 1;
+    const fileList = items
+      .map((item) => ({
+        name: item.name,
+        type: item.isDirectory() ? "Directory" : "File",
+      }))
+      .sort((a, b) => {
+        if (a.type !== b.type) return a.type === "Directory" ? -1 : 1;
 
-          a.type.localeCompare(b.type);
-        });
+        a.type.localeCompare(b.type);
+      });
 
-      console.table(fileList);
-    } catch (error) {
-      console.error("Operation failed");
-    }
+    console.table(fileList);
   }
 
   changeDirectory(pathToDirectory) {
@@ -158,22 +137,18 @@ export class FileManager {
   }
 
   goUp() {
-    try {
-      const currentDir = process.cwd();
-      const parentDir = path.dirname(currentDir);
+    const currentDir = process.cwd();
+    const parentDir = path.dirname(currentDir);
 
-      if (currentDir === parentDir) {
-        console.log(
-          "You are already in the root directory. Cannot go up further."
-        );
-        return;
-      }
-
-      process.chdir(parentDir);
-      console.log(`Changed directory to: ${process.cwd()}`);
-    } catch (error) {
-      console.error("Operation failed", error);
+    if (currentDir === parentDir) {
+      console.log(
+        "You are already in the root directory. Cannot go up further."
+      );
+      return;
     }
+
+    process.chdir(parentDir);
+    console.log(`Changed directory to: ${process.cwd()}`);
   }
 
   sayHello() {
