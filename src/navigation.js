@@ -1,5 +1,4 @@
 import path from "path";
-import fs from "fs";
 import fsp from "fs/promises";
 
 export const list = async () => {
@@ -20,16 +19,16 @@ export const list = async () => {
   console.table(fileList);
 };
 
-export const changeDirectory = (pathToDirectory) => {
+export const changeDirectory = async (pathToDirectory) => {
   const targetPath = path.resolve(pathToDirectory);
 
-  if (fs.existsSync(targetPath) && fs.lstatSync(targetPath).isDirectory()) {
+  const stats = await fsp.stat(targetPath);
+
+  if (stats.isDirectory()) {
     process.chdir(targetPath);
     console.log(`Changed directory to: ${process.cwd()}`);
   } else {
-    console.error(
-      `The specified path does not exist or is not a directory: ${targetPath}`
-    );
+    console.error(`The specified path is not a directory: ${targetPath}`);
   }
 };
 
