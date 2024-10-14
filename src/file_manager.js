@@ -20,6 +20,7 @@ export class FileManager {
     ls: this.list,
     cat: this.cat,
     add: this.createFile,
+    rn: this.renameFile,
   };
 
   handleCommand(input) {
@@ -29,6 +30,19 @@ export class FileManager {
       this.commands[command](...args);
     } else {
       console.error("Invalid input");
+    }
+  }
+
+  async renameFile(oldName, newName) {
+    try {
+      const oldPath = path.resolve(process.cwd(), oldName);
+      const newPath = path.resolve(process.cwd(), newName);
+
+      await fsp.rename(oldPath, newPath);
+
+      console.log(`File renamed from ${oldName} to ${newName}`);
+    } catch (error) {
+      console.error("Operation failed");
     }
   }
 
