@@ -1,5 +1,6 @@
 import os from "os";
 import path from "path";
+import fs from "fs";
 
 export class FileManager {
   constructor(name) {
@@ -11,18 +12,32 @@ export class FileManager {
     console.log(`You are currently in ${process.cwd()}`);
   };
 
+  commands = {
+    ".exit": this.sayGoodbye,
+    up: this.goUp,
+    cd: this.changeDirectory,
+  };
+
   handleCommand(input) {
-    switch (input) {
-      case ".exit":
-        this.sayGoodbye();
-        break;
+    const [command, ...args] = input.split(" ");
 
-      case "up":
-        this.goUp();
-        break;
+    if (this.commands[command]) {
+      this.commands[command](...args);
+    } else {
+      console.error("Invalid input");
+    }
+  }
 
-      default:
-        break;
+  changeDirectory(pathToDirectory) {
+    const targetPath = path.resolve(pathToDirectory);
+
+    if (fs.existsSync(targetPath) && fs.lstatSync(targetPath).isDirectory()) {
+      process.chdir(targetPath);
+      console.log(`Changed directory to: ${process.cwd()}`);
+    } else {
+      console.error(
+        `The specified path does not exist or is not a directory: ${targetPath}`
+      );
     }
   }
 
