@@ -1,7 +1,7 @@
 import os from "os";
+import path from "path";
 
 export class FileManager {
-  // Constructor method to initialize the object
   constructor(name) {
     this.userName = name;
     this.homeDir = os.homedir();
@@ -17,8 +17,31 @@ export class FileManager {
         this.sayGoodbye();
         break;
 
+      case "up":
+        this.goUp();
+        break;
+
       default:
         break;
+    }
+  }
+
+  goUp() {
+    try {
+      const currentDir = process.cwd();
+      const parentDir = path.dirname(currentDir);
+
+      if (currentDir === parentDir) {
+        console.log(
+          "You are already in the root directory. Cannot go up further."
+        );
+        return;
+      }
+
+      process.chdir(parentDir);
+      console.log(`Changed directory to: ${process.cwd()}`);
+    } catch (error) {
+      console.error("Operation failed", error);
     }
   }
 
