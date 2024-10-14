@@ -24,6 +24,7 @@ export class FileManager {
     rn: this.renameFile,
     cp: this.copyFile,
     mv: this.moveFile,
+    rm: this.deleteFile,
   };
 
   handleCommand(input) {
@@ -33,6 +34,18 @@ export class FileManager {
       this.commands[command](...args);
     } else {
       console.error("Invalid input");
+    }
+  }
+
+  async deleteFile(fileName) {
+    try {
+      const filePath = path.resolve(process.cwd(), fileName);
+
+      await fsp.unlink(filePath);
+
+      console.log(`File deleted: ${filePath}`);
+    } catch (error) {
+      console.error("Operation failed");
     }
   }
 
@@ -50,7 +63,7 @@ export class FileManager {
 
       console.log(`File moved from ${sourcePath} to ${destinationPath}`);
     } catch (error) {
-      console.error("Error moving the file:", error.message);
+      console.error("Operation failed");
     }
   }
 
@@ -67,7 +80,7 @@ export class FileManager {
 
       console.log(`File copied from ${sourcePath} to ${destinationPath}`);
     } catch (error) {
-      console.error("Operation failed", error);
+      console.error("Operation failed");
     }
   }
 
