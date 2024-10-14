@@ -1,6 +1,7 @@
 import os from "os";
 import path from "path";
 import fs from "fs";
+import fsp from "fs/promises";
 
 export class FileManager {
   constructor(name) {
@@ -16,6 +17,7 @@ export class FileManager {
     ".exit": this.sayGoodbye,
     up: this.goUp,
     cd: this.changeDirectory,
+    ls: this.list,
   };
 
   handleCommand(input) {
@@ -25,6 +27,29 @@ export class FileManager {
       this.commands[command](...args);
     } else {
       console.error("Invalid input");
+    }
+  }
+
+  async list() {
+    try {
+      const currentDir = process.cwd();
+      const items = await fsp.readdir(currentDir, { withFileTypes: true });
+
+      const fileList = items
+        .map((item) => ({
+          name: item.name,
+          type: item.isDirectory() ? "Directory" : "File",
+        }))
+        .sort((a, b) => {
+          if (a.type !== b.type) {
+            return a.type === "Directory" ? -1 : 1;
+          }
+          a.type.localeCompare(b.type);
+        });
+
+      console.table(fileList);
+    } catch (error) {
+      console.error("Error reading the directory:", error.message);
     }
   }
 
