@@ -19,6 +19,7 @@ export class FileManager {
     cd: this.changeDirectory,
     ls: this.list,
     cat: this.cat,
+    add: this.createFile,
   };
 
   handleCommand(input) {
@@ -41,6 +42,19 @@ export class FileManager {
     readStream.on("error", (error) => {
       console.error("Operation failed");
     });
+  }
+
+  async createFile(fileName) {
+    try {
+      const filePath = path.resolve(process.cwd(), fileName);
+      const fileHandle = await fsp.open(filePath, "w");
+
+      await fileHandle.close();
+
+      console.log(`Empty file created: ${filePath}`);
+    } catch (error) {
+      console.error("Operation failed");
+    }
   }
 
   async list() {
