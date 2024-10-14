@@ -1,26 +1,32 @@
-import { FileManager } from "./src/file_manager.js";
+import {
+  sayHello,
+  sayGoodbye,
+  switchToHomeDir,
+  printCWD,
+} from "./src/utils.js";
+import { handleCommand } from "./src/command_handler.js";
 
 const userName = process.argv?.[2].split("=")?.[1] || "user";
 
-export const fileManager = new FileManager(userName);
+// export const fileManager = new FileManager(userName);
 
 // Change working directory
-fileManager.switchToHomeDir();
+switchToHomeDir();
 
 // Greet user
-fileManager.sayHello();
-FileManager.printCWD();
+sayHello(userName);
+printCWD();
 
 // Say goodbye on exit
 process.on("SIGINT", (code) => {
-  fileManager.sayGoodbye();
+  sayGoodbye(userName);
 });
 
 // Handle commands
 process.stdin.on("data", (data) => {
   const input = data.toString().trim();
 
-  fileManager.handleCommand(input);
+  handleCommand(input);
 
-  FileManager.printCWD();
+  printCWD();
 });
