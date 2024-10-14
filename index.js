@@ -1,6 +1,6 @@
 import { FileManager } from "./src/file_manager.js";
 
-const userName = process.argv?.[2].split("=")?.[1];
+const userName = process.argv?.[2].split("=")?.[1] || "user";
 
 export const fileManager = new FileManager(userName);
 
